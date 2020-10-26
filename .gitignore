@@ -3,3 +3,6 @@ base/consulta_legendas_2014.zip
 base/consulta_legendas_2014/consulta_legendas_2014_AC.csv
 *.csv
 *.pdf
+*.zip
+*.json
+*.pyc
