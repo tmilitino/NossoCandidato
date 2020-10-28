@@ -1,5 +1,11 @@
-
-
+import Descompactador
 import DownloadDados
 
-DownloadDados.DownloadDadosTSE().DownloadLegenda("consulta_*")
+
+ListaAno = [2018,2020]
+
+for ano in ListaAno:
+  nomeArquivo = f"consulta_coligacao_{ano}"
+  DownloadDados.DownloadDadosTSE().DownloadLegenda(nomeArquivo)
+  
+  Descompactador.Descompactador().DescompactadorArquivo(nomeArquivo)
