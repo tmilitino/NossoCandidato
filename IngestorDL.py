@@ -1,12 +1,10 @@
 import zipfile
 import os
 
-class Descompactador(object):
-  """
-  docstring
-  """
-  def _criarParticao(self, Pasta, Particao:str):
-    """ Cria Particao caso não exista"""
+class Ingestor(object):
+  
+  def _criarParticao(self, Pasta, Particao:str)->bool:
+   
     if not os.path.isdir("/".join([Pasta, Particao])):
       os.mkdir("/".join([Pasta, Particao]))
       return True
