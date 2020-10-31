@@ -3,11 +3,8 @@ import configparser
 import pandas as pd
 import os
 
-path="base/consulta_legendas_2014"
-data = list()
-
-t = os.listdir(path)
 class Ingestor():
+  
   
   def _abrirConfig(self):
 
@@ -39,7 +36,7 @@ class Ingestor():
     return ConexaoDW.prepare(queryInsert)
 
   def _listarDado(self, Caminho, ListaArquivos):
-
+    data = list()
     for arquivo in ListaArquivos:
         with open(f"{Caminho}/{arquivo}",'r') as myfile:
             arq = myfile.readlines()
@@ -49,6 +46,11 @@ class Ingestor():
 
 
     return pd.DataFrame(data, columns=head)
+
+  def StartIngestor(self):
+    
+    
+    pass
 
 dfLegenda = df[["NR_PARTIDO","SG_PARTIDO","NM_PARTIDO"]].drop_duplicates().reset_index()
 
