@@ -22,16 +22,15 @@ class Transformacao():
 
   def _selectColunas(self, Tabela):
     db = self._conectaCaptura()
-    sql = f"select * from {Tabela}"
+    sql = f"select nome_coluna from colunas where tabela = {Tabela}"
     rs=db.prepare(sql)
     db.close()
-    return {linha.tabela : {linha.chave: linha.coluna}for linha in rs:
-      linha
+    return [linha for linha in rs]
 
-  def ListaColunas(self):
-    self._selectColunas
-    pass
-dfLegenda = df[["NR_PARTIDO","SG_PARTIDO","NM_PARTIDO"]].drop_duplicates().reset_index()
+  def ListaColunas(self, df, insertLegenda):
+    ListaColunas = self._selectColunas("teste")
+    
+    dfLegenda = df[ListaColunas].drop_duplicates().reset_index()
 
 
-dfLegenda.apply( lambda x: insertLegenda(int(x["NR_PARTIDO"]),x["NM_PARTIDO"],x["SG_PARTIDO"]),axis=1)
+    dfLegenda.apply( lambda x: insertLegenda(int(x["NR_PARTIDO"]),x["NM_PARTIDO"],x["SG_PARTIDO"]),axis=1)
