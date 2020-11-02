@@ -1,11 +1,12 @@
-import Descompactador
-import DownloadDados
+# import Descompactador
+import IngestorDW
+import Transformacoes
 
 
-ListaAno = [2018,2020]
+ListaAno = [2018]
 
 for ano in ListaAno:
   nomeArquivo = f"consulta_coligacao_{ano}"
-  DownloadDados.DownloadDadosTSE().DownloadLegenda(nomeArquivo)
+  # DownloadDados.DownloadDadosTSE().DownloadLegenda(nomeArquivo)
   
-  Descompactador.Descompactador().DescompactadorArquivo(nomeArquivo)
+  IngestorDW.Ingestor().StartIngestor(nomeArquivo)
