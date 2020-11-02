@@ -19,7 +19,7 @@ class Ingestor():
 
   def _conectaDW(self):
 
-    return postgresql.open(f'pq://{self.user}:{self.senha}@{self.host}:{self.port}/{self.database}')
+    return postgresql.open(f'pq://{self.user}:{self.senha}@{self.host}:{self.port}/{self.database}')  
 
   def _listarArquivos(self,caminho)->list:
 
@@ -47,13 +47,22 @@ class Ingestor():
 
     return pd.DataFrame(data, columns=head)
 
-  def StartIngestor(self):
+  def StartIngestor(self, NomeArquivo):
     
+    self._abrirConfig()
+    conexo = self._conectaDW()
+    larqi = self._listarArquivos("base/consulta_coligacao/2018")
+    df = self._listarDado("base/consulta_coligacao/2018",larqi)
+
+    insertLegenda = self._Preparacao(conexo,"partidos", ['legenda', "nome_partido", "sigla"])
+
+    dfLegenda = df[["NR_PARTIDO","SG_PARTIDO","NM_PARTIDO"]].drop_duplicates().reset_index()
     
-    pass
+    dfLegenda["NR_PARTIDO"] = dfLegenda["NR_PARTIDO"].astype(int)
 
-dfLegenda = df[["NR_PARTIDO","SG_PARTIDO","NM_PARTIDO"]].drop_duplicates().reset_index()
+    dfLegenda.apply( lambda x: insertLegenda.load_rows([tuple(x[["NR_PARTIDO","NM_PARTIDO","SG_PARTIDO"]])]),axis=1)
+    insertLegenda.close()
 
 
-dfLegenda.apply( lambda x: insertLegenda(int(x["NR_PARTIDO"]),x["NM_PARTIDO"],x["SG_PARTIDO"]),axis=1)
+
 
