@@ -6,7 +6,7 @@ import os
 class Ingestor():
   
   
-  def _abrirConfig(self):
+  def _AbrirConfig(self):
 
     config = configparser.ConfigParser()
     config.read("CONFIG/GERAL.CFG")
@@ -16,12 +16,13 @@ class Ingestor():
     self.host = config["DEFAULT"]["host"]
     self.port = config["DEFAULT"]["port"]
     self.database = config["DEFAULT"]["database"]
+    self.dirBase = config["DEFAULT"]["dirBase"]
 
-  def _conectaDW(self):
+  def _ConectaDW(self):
 
     return postgresql.open(f'pq://{self.user}:{self.senha}@{self.host}:{self.port}/{self.database}')  
 
-  def _listarArquivos(self,caminho)->list:
+  def _ListarArquivos(self,caminho)->list:
 
     return [f for f in os.listdir(caminho) if os.path.isfile(f"{caminho}/{f}")]
 
@@ -35,7 +36,7 @@ class Ingestor():
 
     return ConexaoDW.prepare(queryInsert)
 
-  def _listarDado(self, Caminho, ListaArquivos):
+  def _ListarDado(self, Caminho, ListaArquivos):
     data = list()
     for arquivo in ListaArquivos:
         with open(f"{Caminho}/{arquivo}",'r') as myfile:
@@ -47,21 +48,28 @@ class Ingestor():
 
     return pd.DataFrame(data, columns=head)
 
-  def StartIngestor(self, NomeArquivo):
-    
-    self._abrirConfig()
-    conexo = self._conectaDW()
-    larqi = self._listarArquivos("base/consulta_coligacao/2018")
-    df = self._listarDado("base/consulta_coligacao/2018",larqi)
+  def _DadosCaptura(self)->dict:
+    pass
 
-    insertLegenda = self._Preparacao(conexo,"partidos", ['legenda', "nome_partido", "sigla"])
-
-    dfLegenda = df[["NR_PARTIDO","SG_PARTIDO","NM_PARTIDO"]].drop_duplicates().reset_index()
+  def StartIngestor(self, NomePasta:str, Ano:str):
     
+    self._AbrirConfig()
+    conexo = self._ConectaDW()
+    lArquivo = self._ListarArquivos(self.dirBase.format(NomePasta, Ano))
+    df = self._ListarDado(self.dirBase.format(NomePasta, Ano),lArquivo)
+
+    insertFunc = self._Preparacao(conexo,"partidos", ['legenda', "nome_partido", "sigla"])
+    
+    te = ["NR_PARTIDO","SG_PARTIDO","NM_PARTIDO"]
+
+    dfLegenda = df[te].drop_duplicates().reset_index()
+    
+    print(dfLegenda.shape)
+
     dfLegenda["NR_PARTIDO"] = dfLegenda["NR_PARTIDO"].astype(int)
 
-    dfLegenda.apply( lambda x: insertLegenda.load_rows([tuple(x[["NR_PARTIDO","NM_PARTIDO","SG_PARTIDO"]])]),axis=1)
-    insertLegenda.close()
+    dfLegenda.apply( lambda x: insertFunc.load_rows([tuple(x[te])]),axis=1)
+    insertFunc.close()
 
 
 
